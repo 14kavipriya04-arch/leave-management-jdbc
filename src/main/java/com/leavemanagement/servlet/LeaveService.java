@@ -29,7 +29,7 @@ public class LeaveService {
             false,
             "You already requested " + alreadyRequested +
             " days. Cannot request " + days +
-            " more days. Leave balance is only " +
+            " more days. Leave Total is only " +
             user.getLeaveBalance()
         );
     }
