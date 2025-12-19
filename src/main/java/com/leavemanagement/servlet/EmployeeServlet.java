@@ -85,6 +85,13 @@ public class EmployeeServlet extends HttpServlet {
                     java.sql.Date.valueOf(request.getParameter("leaveDate"));
 
             HttpSession session = request.getSession(false);
+
+            // HttpSession session = request.getSession(false);
+            if (session == null || session.getAttribute("userId") == null) {
+                request.setAttribute("message", "Session expired. Please login again.");
+                request.setAttribute("messageType", "error");
+                return;
+            }
             int userId = (int) session.getAttribute("userId");
 
             int days = Integer.parseInt(request.getParameter("days"));
