@@ -20,27 +20,30 @@
 //         }
 //     }
 // }
-package com.leavemanagement.servlet; // keep YOUR package name
+// package com.leavemanagement.servlet;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 
 public class DatabaseConnection {
 
-    private static final String URL =
-        "jdbc:postgresql://localhost:5432/leave_management";
+    private static final String DB_URL =
+            System.getenv("DATABASE_URL");
 
-    private static final String USER = "postgres";
-    private static final String PASSWORD = "kavi"; // your pg password
+    static {
+        try {
+            Class.forName("org.postgresql.Driver");
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException("PostgreSQL Driver not found", e);
+        }
+    }
 
     public static Connection getConnection() {
         try {
-            Class.forName("org.postgresql.Driver");
-            return DriverManager.getConnection(URL, USER, PASSWORD);
+            return DriverManager.getConnection(DB_URL);
         } catch (Exception e) {
             e.printStackTrace();
-            throw new RuntimeException("PostgreSQL connection failed");
+            throw new RuntimeException("Database connection failed");
         }
     }
 }
-
