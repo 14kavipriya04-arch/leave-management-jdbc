@@ -35,12 +35,12 @@ public class DatabaseConnection {
                 throw new RuntimeException("DATABASE_URL not set");
             }
 
-            // 🔥 IMPORTANT: Convert Render URL to JDBC URL
+            //  IMPORTANT: Convert Render URL to JDBC URL
             if (dbUrl.startsWith("postgresql://")) {
                 dbUrl = dbUrl.replace("postgresql://", "jdbc:postgresql://");
             }
 
-            // 🔐 Ensure SSL (Render requires this)
+            //  Ensure SSL (Render requires this)
             if (!dbUrl.contains("sslmode")) {
                 dbUrl += "?sslmode=require";
             }
