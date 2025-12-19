@@ -20,7 +20,7 @@
 //         }
 //     }
 // }
-// package com.leavemanagement.servlet;
+package com.leavemanagement.servlet;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
