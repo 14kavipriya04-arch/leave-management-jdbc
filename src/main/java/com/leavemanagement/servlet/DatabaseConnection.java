@@ -27,23 +27,31 @@ import java.sql.DriverManager;
 
 public class DatabaseConnection {
 
-    private static final String DB_URL =
-            System.getenv("DATABASE_URL");
-
-    static {
-        try {
-            Class.forName("org.postgresql.Driver");
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException("PostgreSQL Driver not found", e);
-        }
-    }
-
     public static Connection getConnection() {
         try {
-            return DriverManager.getConnection(DB_URL);
+            String dbUrl = System.getenv("DATABASE_URL");
+
+            if (dbUrl == null || dbUrl.isEmpty()) {
+                throw new RuntimeException("DATABASE_URL not set");
+            }
+
+            // 🔥 IMPORTANT: Convert Render URL to JDBC URL
+            if (dbUrl.startsWith("postgresql://")) {
+                dbUrl = dbUrl.replace("postgresql://", "jdbc:postgresql://");
+            }
+
+            // 🔐 Ensure SSL (Render requires this)
+            if (!dbUrl.contains("sslmode")) {
+                dbUrl += "?sslmode=require";
+            }
+
+            Class.forName("org.postgresql.Driver");
+            return DriverManager.getConnection(dbUrl);
+
         } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException("Database connection failed");
         }
     }
 }
+
