@@ -11,7 +11,6 @@ import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.DriverManager;
 
-@WebServlet("/db-test")
 public class DBConnectionTestServlet extends HttpServlet {
 
     private static final String JDBC_URL =
@@ -39,7 +38,7 @@ public class DBConnectionTestServlet extends HttpServlet {
 
             con.close();
         } catch (Exception e) {
-            out.println("❌ DATABASE CONNECTION FAILED");
+            out.println(" DATABASE CONNECTION FAILED");
             e.printStackTrace(out);
         }
     }

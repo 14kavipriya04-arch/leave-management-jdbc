@@ -1,13 +1,10 @@
 package com.leavemanagement.servlet;
 
-// import com.leavemanagement.util.DatabaseConnection;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
-
 import java.sql.Statement;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,149 +14,154 @@ public class User {
     private String name;
     private String role;
     private int leaveBalance;
-
     private String password;
 
+    /* ---------- CONSTRUCTOR ---------- */
+
     public User(int userId, String name, String role, int leaveBalance, String password) {
-    this.userId = userId;
-    this.name = name;
-    this.role = role;
-    this.leaveBalance = leaveBalance;
-    this.password = password;
-}
+        this.userId = userId;
+        this.name = name;
+        this.role = role;
+        this.leaveBalance = leaveBalance;
+        this.password = password;
+    }
 
-
-    /* ---------- DB Operations ---------- */
+    /* ---------- LOAD SINGLE USER ---------- */
 
     public static User loadFromDB(int userId) {
 
-        String sql = "SELECT * FROM users WHERE userId = ?";
+        String sql =
+            "SELECT userId, name, role, leave_balance, password " +
+            "FROM users WHERE userId = ?";
 
         try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+             PreparedStatement ps = conn.prepareStatement(sql)) {
 
-            stmt.setInt(1, userId);
+            ps.setInt(1, userId);
 
-            try (ResultSet rs = stmt.executeQuery()) {
+            try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     return new User(
-                            rs.getInt("userId"),
-                            rs.getString("name"),
-                            rs.getString("role"),
-                            rs.getInt("leave_balance"),
-                             rs.getString("password")
+                        rs.getInt("userId"),
+                        rs.getString("name"),
+                        rs.getString("role"),
+                        rs.getInt("leave_balance"),
+                        rs.getString("password")
                     );
                 }
             }
+
         } catch (Exception e) {
-            return null;
+            e.printStackTrace();
         }
         return null;
     }
+
+    /* ---------- LOGIN ---------- */
+
+    public static User login(int userId, String password) {
+
+        String sql =
+            "SELECT userId, name, role, leave_balance, password " +
+            "FROM users WHERE userId = ? AND password = ?";
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, userId);
+            ps.setString(2, password);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return new User(
+                        rs.getInt("userId"),
+                        rs.getString("name"),
+                        rs.getString("role"),
+                        rs.getInt("leave_balance"),
+                        rs.getString("password")
+                    );
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    /* ---------- UPDATE LEAVE BALANCE ---------- */
 
     public boolean saveToDB() {
 
         String sql = "UPDATE users SET leave_balance = ? WHERE userId = ?";
 
         try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+             PreparedStatement ps = conn.prepareStatement(sql)) {
 
-            stmt.setInt(1, leaveBalance);
-            stmt.setInt(2, userId);
-            return stmt.executeUpdate() > 0;
+            ps.setInt(1, leaveBalance);
+            ps.setInt(2, userId);
+            return ps.executeUpdate() > 0;
 
         } catch (Exception e) {
+            e.printStackTrace();
             return false;
         }
     }
 
-    /* ---------- Getters ---------- */
-
-    public int getUserId() {
-        return userId;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public int getLeaveBalance() {
-        return leaveBalance;
-    }
-
-    public String getRole() {
-        return role;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    /* ---------- Business ---------- */
-
-    public void setLeaveBalance(int days) {
-        this.leaveBalance = days;
-        saveToDB();
-    }
-
     public void updateLeaveBalanceInDB() throws SQLException {
-        Connection conn = DatabaseConnection.getConnection();
-        PreparedStatement ps =
-            conn.prepareStatement("UPDATE users SET leave_balance=? WHERE userId=?");
-        ps.setInt(1, leaveBalance);
-        ps.setInt(2, userId);
-        ps.executeUpdate();
+
+        String sql = "UPDATE users SET leave_balance = ? WHERE userId = ?";
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, leaveBalance);
+            ps.setInt(2, userId);
+            ps.executeUpdate();
+        }
     }
+
+    /* ---------- FETCH ALL USERS ---------- */
+
     public static List<User> getAllEmployees() {
+
         List<User> users = new ArrayList<>();
 
-        String sql = "SELECT userId, name, role, leave_balance FROM users";
+        String sql =
+            "SELECT userId, name, role, leave_balance, password FROM users";
 
         try (Connection con = DatabaseConnection.getConnection();
-            Statement st = con.createStatement();
-            ResultSet rs = st.executeQuery(sql)) {
+             Statement st = con.createStatement();
+             ResultSet rs = st.executeQuery(sql)) {
 
             while (rs.next()) {
-                User u = new User(
+                users.add(new User(
                     rs.getInt("userId"),
                     rs.getString("name"),
                     rs.getString("role"),
                     rs.getInt("leave_balance"),
                     rs.getString("password")
-                );
-                users.add(u);
+                ));
             }
+
         } catch (Exception e) {
             e.printStackTrace();
         }
         return users;
     }
-    public static User login(int userId, String password) {
 
-        String sql = "SELECT * FROM users WHERE userId=? AND password=?";
+    /* ---------- GETTERS ---------- */
 
-        try (Connection conn = DatabaseConnection.getConnection();
-            PreparedStatement ps = conn.prepareStatement(sql)) {
+    public int getUserId() { return userId; }
+    public String getName() { return name; }
+    public String getRole() { return role; }
+    public int getLeaveBalance() { return leaveBalance; }
+    public String getPassword() { return password; }
 
-            ps.setInt(1, userId);
-            ps.setString(2, password);
+    /* ---------- BUSINESS ---------- */
 
-            ResultSet rs = ps.executeQuery();
-
-            if (rs.next()) {
-                return new User(
-                    rs.getInt("userId"),
-                    rs.getString("name"),
-                    rs.getString("role"),
-                    rs.getInt("leave_balance"),
-                    rs.getString("password")
-                );
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
+    public void setLeaveBalance(int days) {
+        this.leaveBalance = days;
+        saveToDB();
     }
-
 }
