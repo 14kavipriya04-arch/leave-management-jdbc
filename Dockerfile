@@ -1,14 +1,12 @@
-# Use official Tomcat 11 with Java 17
+# ---------- Build stage ----------
+FROM maven:3.9.9-eclipse-temurin-17 AS build
+WORKDIR /app
+COPY . .
+RUN mvn clean package -DskipTests
+
+# ---------- Run stage ----------
 FROM tomcat:11.0-jdk17
-
-# Remove default ROOT app
 RUN rm -rf /usr/local/tomcat/webapps/*
-
-# Copy WAR built by Maven into Tomcat
-COPY target/leave.war /usr/local/tomcat/webapps/ROOT.war
-
-# Expose Tomcat port
+COPY --from=build /app/target/leave.war /usr/local/tomcat/webapps/ROOT.war
 EXPOSE 8080
-
-# Start Tomcat
 CMD ["catalina.sh", "run"]
