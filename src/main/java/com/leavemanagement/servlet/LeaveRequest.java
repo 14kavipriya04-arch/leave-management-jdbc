@@ -1,5 +1,7 @@
 package com.leavemanagement.servlet;
 
+// import com.leavemanagement.util.DatabaseConnection;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -16,9 +18,29 @@ public class LeaveRequest {
 
     private String approvedBy;
 
+    private String leaveType;     // SICK or CASUAL
+    private java.sql.Date leaveDate;
+
+        public String getLeaveType() {
+        return leaveType;
+    }
+
+    public void setLeaveType(String leaveType) {
+        this.leaveType = leaveType;
+    }
+
+    public java.sql.Date getLeaveDate() {
+        return leaveDate;
+    }
+
+    public void setLeaveDate(java.sql.Date leaveDate) {
+        this.leaveDate = leaveDate;
+    }
+
     public String getApprovedBy() {
         return approvedBy;
     }
+
 
     public void setApprovedBy(String approvedBy) {
         this.approvedBy = approvedBy;
@@ -31,12 +53,18 @@ public class LeaveRequest {
     }
 
 
-    public LeaveRequest(int userId, int leaveDays, String applyReason) {
+    public LeaveRequest(int userId, int leaveDays,
+                    String applyReason, String leaveType,
+                    java.sql.Date leaveDate) {
+
         this.userId = userId;
         this.leaveDays = leaveDays;
         this.applyReason = applyReason;
+        this.leaveType = leaveType;
+        this.leaveDate = leaveDate;
         this.leaveStatus = "Pending";
     }
+
 
     private LeaveRequest(int leaveRequestId, int userId,
                          String leaveStatus, int leaveDays) {
@@ -50,8 +78,8 @@ public class LeaveRequest {
 
     public boolean save() {
         String sql =
-                "INSERT INTO leave_requests (userId, leaveStatus, leaveDays, apply_reason) " +
-                "VALUES (?, ?, ? ,?)";
+                "INSERT INTO leave_requests (userId, leaveStatus, leaveDays, apply_reason, leave_type, leave_date) " +
+                "VALUES (?, ?, ? ,?, ?, ?)";
 
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt =
@@ -61,7 +89,8 @@ public class LeaveRequest {
             stmt.setString(2, leaveStatus);
             stmt.setInt(3, leaveDays);
             stmt.setString(4, applyReason);
-
+            stmt.setString(5, leaveType);
+            stmt.setDate(6, leaveDate);
             int rows = stmt.executeUpdate();
             if (rows == 0) return false;
 

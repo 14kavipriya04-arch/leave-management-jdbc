@@ -21,7 +21,7 @@
         <h2>Login</h2>
 
         <label>User ID</label>
-        <input type="number" name="userId" required>
+        <input type="text" name="userId" required>
 
         <label>Password</label>
         <input type="password" name="password" required>

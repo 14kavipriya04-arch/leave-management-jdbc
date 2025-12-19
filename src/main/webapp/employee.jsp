@@ -97,6 +97,15 @@
 
             <label>Number of Days</label>
             <input type="number" name="days" min="1" max="30" required>
+            <label>Leave Type</label>
+            <select name="leaveType" required>
+                <option value="">-- Select Leave Type --</option>
+                <option value="SICK">Sick Leave</option>
+                <option value="CASUAL">Casual Leave</option>
+            </select>
+            <label>Leave Date</label>
+            <input type="date" name="leaveDate" required>
+
 
             <label>Reason for Leave</label>
             <textarea name="reason" rows="3" required></textarea>

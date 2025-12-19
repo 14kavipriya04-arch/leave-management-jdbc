@@ -1,5 +1,7 @@
 package com.leavemanagement.servlet;
 
+// import com.leavemanagement.util.DatabaseConnection;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -44,7 +46,7 @@ public class User {
                             rs.getInt("userId"),
                             rs.getString("name"),
                             rs.getString("role"),
-                            rs.getInt("leaveBalance"),
+                            rs.getInt("leave_balance"),
                              rs.getString("password")
                     );
                 }
@@ -57,7 +59,7 @@ public class User {
 
     public boolean saveToDB() {
 
-        String sql = "UPDATE users SET leaveBalance = ? WHERE userId = ?";
+        String sql = "UPDATE users SET leave_balance = ? WHERE userId = ?";
 
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -103,7 +105,7 @@ public class User {
     public void updateLeaveBalanceInDB() throws SQLException {
         Connection conn = DatabaseConnection.getConnection();
         PreparedStatement ps =
-            conn.prepareStatement("UPDATE users SET leaveBalance=? WHERE userId=?");
+            conn.prepareStatement("UPDATE users SET leave_balance=? WHERE userId=?");
         ps.setInt(1, leaveBalance);
         ps.setInt(2, userId);
         ps.executeUpdate();
@@ -111,7 +113,7 @@ public class User {
     public static List<User> getAllEmployees() {
         List<User> users = new ArrayList<>();
 
-        String sql = "SELECT userId, name, role, leaveBalance FROM users";
+        String sql = "SELECT userId, name, role, leave_balance FROM users";
 
         try (Connection con = DatabaseConnection.getConnection();
             Statement st = con.createStatement();
@@ -122,7 +124,7 @@ public class User {
                     rs.getInt("userId"),
                     rs.getString("name"),
                     rs.getString("role"),
-                    rs.getInt("leaveBalance"),
+                    rs.getInt("leave_balance"),
                     rs.getString("password")
                 );
                 users.add(u);
@@ -149,7 +151,7 @@ public class User {
                     rs.getInt("userId"),
                     rs.getString("name"),
                     rs.getString("role"),
-                    rs.getInt("leaveBalance"),
+                    rs.getInt("leave_balance"),
                     rs.getString("password")
                 );
             }

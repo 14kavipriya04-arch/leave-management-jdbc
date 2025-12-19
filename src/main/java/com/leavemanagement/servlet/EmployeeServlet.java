@@ -1,5 +1,6 @@
 package com.leavemanagement.servlet;
 
+
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -79,6 +80,10 @@ public class EmployeeServlet extends HttpServlet {
 
     private void applyLeave(HttpServletRequest request) {
         try {
+            String leaveType = request.getParameter("leaveType");
+            java.sql.Date leaveDate =
+                    java.sql.Date.valueOf(request.getParameter("leaveDate"));
+
             HttpSession session = request.getSession(false);
             int userId = (int) session.getAttribute("userId");
 
@@ -88,7 +93,9 @@ public class EmployeeServlet extends HttpServlet {
             User user = User.loadFromDB(userId);
 
             LeaveService service = new LeaveService();
-            OperationResult result = service.applyLeave(user, days, reason);
+            OperationResult result =
+                service.applyLeave(user, days, reason, leaveType, leaveDate);
+
 
             request.setAttribute("message", result.getMessage());
             request.setAttribute("messageType",

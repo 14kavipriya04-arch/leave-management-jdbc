@@ -1,5 +1,7 @@
 package com.leavemanagement.servlet;
 
+// import com.leavemanagement.util.DatabaseConnection;
+
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
@@ -10,8 +12,37 @@ import java.sql.PreparedStatement;
 
 public class LeaveService {
 
-    public OperationResult applyLeave(User user, int days, String reason)
-{
+    public OperationResult applyLeave(User user,
+                                  int days,
+                                  String reason,
+                                  String leaveType,
+                                  java.sql.Date leaveDate)
+
+    {
+        java.time.LocalDate today = java.time.LocalDate.now();
+        java.time.LocalDate selectedDate = leaveDate.toLocalDate();
+
+        if ("SICK".equalsIgnoreCase(leaveType)) {
+
+            if (!selectedDate.equals(today)) {
+                return new OperationResult(
+                    false,
+                    "Sick leave can be applied only for today"
+                );
+            }
+
+        } else if ("CASUAL".equalsIgnoreCase(leaveType)) {
+
+            if (!selectedDate.isAfter(today.plusDays(4))) {
+                return new OperationResult(
+                    false,
+                    "Casual leave must be applied at least 5 days in advance"
+                );
+            }
+
+        } else {
+            return new OperationResult(false, "Invalid leave type");
+        }
 
     if (user == null) {
         return new OperationResult(false, "User not found");
@@ -39,7 +70,10 @@ public class LeaveService {
     }
 
     
-    LeaveRequest lr = new LeaveRequest(user.getUserId(), days, reason);
+    // LeaveRequest lr = new LeaveRequest(user.getUserId(), days, reason);
+    LeaveRequest lr =
+    new LeaveRequest(user.getUserId(), days, reason, leaveType, leaveDate);
+
     boolean saved = lr.save();
 
 
